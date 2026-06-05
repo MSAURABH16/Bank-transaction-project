@@ -1,103 +1,198 @@
-require('dotenv').config();
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    type: 'OAuth2',
-    user: process.env.EMAIL_USER,
-    clientId: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET,
-    refreshToken: process.env.REFRESH_TOKEN,
-  },
+    service: 'gmail',
+    auth: {
+        type: 'OAuth2',
+        user: process.env.EMAIL_USER,
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
+        refreshToken: process.env.REFRESH_TOKEN,
+    },
 });
 
 // Verify the connection configuration
 transporter.verify((error, success) => {
-  if (error) {
-    console.error('Error connecting to email server:', error);
-  } else {
-    console.log('Email server is ready to send messages');
-  }
+    if (error) {
+        console.error('Error connecting to email server:', error);
+    } else {
+        console.log('Email server is ready to send messages');
+    }
 });
+
 
 // Function to send email
 const sendEmail = async (to, subject, text, html) => {
-  try {
-    const info = await transporter.sendMail({
-      from: `"SwiftLedger" <${process.env.EMAIL_USER}>`, // sender address
-      to, // list of receivers
-      subject, // Subject line
-      text, // plain text body
-      html, // html body
-    });
+    try {
+        const info = await transporter.sendMail({
+            from: `"Backend Ledger" <${process.env.EMAIL_USER}>`, // sender address
+            to, // list of receivers
+            subject, // Subject line
+            text, // plain text body
+            html, // html body
+        });
 
-    console.log('Message sent: %s', info.messageId);
-    console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-  } catch (error) {
-    console.error('Error sending email:', error);
-  }
+        console.log('Message sent: %s', info.messageId);
+        console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+    } catch (error) {
+        console.error('Error sending email:', error);
+    }
 };
 
 
-
 async function sendRegistrationEmail(userEmail, name) {
-    const subject = "Welcome to SwiftLedger";
-
-    const text = `Hello ${name},
-Your SwiftLedger account has been created successfully.
-Thank you for registering with us.
-
-Regards,
-SwiftLedger Team`;
-
+    const subject = 'Welcome to Backend Ledger!';
+    const text = `Hello ${name},\n\nThank you for registering at Backend Ledger. We're excited to have you on board!\n\nBest regards,\nThe Backend Ledger Team`;
     const html = `
-<div style="font-family: Arial, sans-serif; background-color:#f4f7fb; padding:30px;">
-    <div style="max-width:600px; margin:auto; background:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.08);">
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body style="margin:0;padding:0;background-color:#f4f7fa;font-family:Arial,sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+            <td align="center" style="padding:40px 20px;">
+                <table width="600" cellpadding="0" cellspacing="0"
+                       style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
 
-        <div style="background:#2563eb; padding:20px; text-align:center;">
-            <h1 style="color:white; margin:0;">SwiftLedger</h1>
-        </div>
+                    <tr>
+                        <td style="background:#2563eb;padding:24px;text-align:center;">
+                            <h1 style="color:white;margin:0;">SwiftLedger</h1>
+                        </td>
+                    </tr>
 
-        <div style="padding:30px; color:#333;">
-            <h2 style="margin-top:0;">Welcome, ${name}! 🎉</h2>
+                    <tr>
+                        <td style="padding:32px;">
+                            <h2 style="color:#111827;margin-top:0;">
+                                Welcome, ${name}! 🎉
+                            </h2>
 
-            <p>
-                Your SwiftLedger account has been successfully created.
-            </p>
+                            <p style="color:#4b5563;line-height:1.6;">
+                                Thank you for registering with SwiftLedger.
+                                Your account has been successfully created and is ready to use.
+                            </p>
 
-            <div style="background:#f8fafc; border-left:4px solid #2563eb; padding:15px; margin:20px 0;">
-                <strong>You can now:</strong>
-                <ul style="padding-left:20px;">
-                    <li>Manage bank accounts</li>
-                    <li>Track transaction history</li>
-                    <li>Transfer funds securely</li>
-                    <li>Monitor account activity</li>
-                </ul>
-            </div>
+                            <div style="background:#eff6ff;border-left:4px solid #2563eb;padding:16px;margin:24px 0;">
+                                <strong>Account Status:</strong> Active
+                            </div>
 
-            <p>
-                We're excited to have you onboard and look forward to providing a secure banking experience.
-            </p>
+                            <p style="color:#4b5563;line-height:1.6;">
+                                We're excited to have you onboard.
+                            </p>
 
-            <p>
-                Regards,<br>
-                <strong>SwiftLedger Team</strong>
-            </p>
-        </div>
+                            <p style="margin-top:32px;">
+                                Best regards,<br>
+                                <strong>SwiftLedger Team</strong>
+                            </p>
+                        </td>
+                    </tr>
 
-        <div style="background:#f8fafc; text-align:center; padding:15px; font-size:12px; color:#666;">
-            This is an automated email. Please do not reply.
-        </div>
+                    <tr>
+                        <td style="background:#f9fafb;padding:16px;text-align:center;font-size:12px;color:#6b7280;">
+                            © 2026 SwiftLedger. All rights reserved.
+                        </td>
+                    </tr>
 
-    </div>
-</div>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
 `;
+
     await sendEmail(userEmail, subject, text, html);
 }
 
+async function sendTransactionEmail(userEmail, name, amount, toAccount) {
+    const subject = 'Transaction Successful!';
+    const text = `Hello ${name},\n\nYour transaction of $${amount} to account ${toAccount} was successful.\n\nBest regards,\nThe Backend Ledger Team`;
+    const html = `
+<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#f4f7fa;font-family:Arial,sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+            <td align="center" style="padding:40px 20px;">
+                <table width="600" style="background:white;border-radius:12px;padding:32px;">
+                    <tr>
+                        <td>
+                            <h2 style="color:#16a34a;">Transaction Successful ✅</h2>
+
+                            <p>Hello ${name},</p>
+
+                            <div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:16px;">
+                                <p><strong>Amount:</strong> $${amount}</p>
+                                <p><strong>Recipient Account:</strong> ${toAccount}</p>
+                                <p><strong>Status:</strong> Successful</p>
+                            </div>
+
+                            <p>Thank you for using SwiftLedger.</p>
+
+                            <p>
+                                Best regards,<br>
+                                <strong>SwiftLedger Team</strong>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+`;
+
+    await sendEmail(userEmail, subject, text, html);
+}
+
+async function sendTransactionFailureEmail(userEmail, name, amount, toAccount) {
+    const subject = 'Transaction Failed';
+    const text = `Hello ${name},\n\nWe regret to inform you that your transaction of $${amount} to account ${toAccount} has failed. Please try again later.\n\nBest regards,\nThe Backend Ledger Team`;
+    const html = `
+<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#f4f7fa;font-family:Arial,sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+            <td align="center" style="padding:40px 20px;">
+                <table width="600" style="background:white;border-radius:12px;padding:32px;">
+                    <tr>
+                        <td>
+                            <h2 style="color:#dc2626;">Transaction Failed ❌</h2>
+
+                            <p>Hello ${name},</p>
+
+                            <div style="background:#fef2f2;border-left:4px solid #dc2626;padding:16px;">
+                                <p><strong>Amount:</strong> $${amount}</p>
+                                <p><strong>Recipient Account:</strong> ${toAccount}</p>
+                                <p><strong>Status:</strong> Failed</p>
+                            </div>
+
+                            <p>
+                                Please verify your account details and try again later.
+                            </p>
+
+                            <p>
+                                Best regards,<br>
+                                <strong>SwiftLedger Team</strong>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+`;
+
+    await sendEmail(userEmail, subject, text, html);
+}
 
 module.exports = {
-    sendEmail,
-    sendRegistrationEmail
+    sendRegistrationEmail,
+    sendTransactionEmail,
+    sendTransactionFailureEmail
 };
