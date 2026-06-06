@@ -23,7 +23,9 @@ transporter.verify((error, success) => {
 
 // Function to send email
 const sendEmail = async (to, subject, text, html) => {
+    console.log("sendEmail called");
     try {
+        console.log("Sending mail to:", to);
         const info = await transporter.sendMail({
             from: `"SwiftLedger" <${process.env.EMAIL_USER}>`,
             to,
@@ -39,6 +41,7 @@ const sendEmail = async (to, subject, text, html) => {
 };
 
 async function sendRegistrationEmail(userEmail, name) {
+    console.log("sendRegistrationEmail called");
     const subject = 'Welcome to SwiftLedger!';
 
     const text = `Hello ${name},
