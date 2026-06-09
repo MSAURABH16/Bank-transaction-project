@@ -9,7 +9,7 @@ app.use(
     cors({
         origin: [
             "http://localhost:5173",
-            "https://swift-ledger-frontend.vercel.app"
+            "https://swiftledger.vercel.app"
         ],
         credentials: true,
     })
